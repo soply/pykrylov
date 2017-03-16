@@ -221,7 +221,7 @@ class LSMRFramework(KrylovMethod):
             u /= beta
             if M is not None: Mu /= beta
 
-            Nv = A.T * u
+            Nv = A.T.dot(u)
             if N is not None:
                 v = N(Nv)
             else:
@@ -308,7 +308,7 @@ class LSMRFramework(KrylovMethod):
             #         beta*M*u  =  A*v   -  alpha*M*u,
             #        alpha*C*v  =  A'*u  -  beta*C*v.
 
-            Mu = A * v - alpha * Mu
+            Mu = A.dot(v) - alpha * Mu
             if M is not None:
                 u = M(Mu)
             else:
@@ -319,7 +319,7 @@ class LSMRFramework(KrylovMethod):
                 u /= beta
                 if M is not None: Mu /= beta
 
-                Nv = A.T * u - beta * Nv
+                Nv = A.T.dot(u) - beta * Nv
                 if N is not None:
                     v = N(Nv)
                 else:
@@ -424,6 +424,10 @@ class LSMRFramework(KrylovMethod):
             test3   =      1/condA
             t1      =  test1/(1 + normA*normx/normb)
             rtol    = btol + atol*normA*normx/normb
+
+            # TK: Breaks otherwise sometimes
+            if normr == 0:
+                normr = 1e-16
 
             if store_resids:
                 self.norms.append(xNrgNorm2)
